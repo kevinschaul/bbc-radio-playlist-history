@@ -1,0 +1,34 @@
+name: Scrape
+
+on:
+  push:
+    paths:
+      - .github/workflows/scrape.yml
+  workflow_dispatch:
+  schedule:
+    - cron: '42 6 * * *' # Run this workflow once a day (at 6:42 am, why not)
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.4.1
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Scrape
+        run: npm run scrape
+
+      - name: Commit and push if it changed
+        run: |-
+          git config user.name "Automated"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          timestamp=$(date -u)
+          git commit -m "Latest data: ${timestamp}" || exit 0
+          git push

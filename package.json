@@ -1,0 +1,27 @@
+{
+  "name": "bbc-radio-playlist-history",
+  "version": "0.0.1",
+  "description": "BBC Radio program playlists history",
+  "main": "index.js",
+  "scripts": {
+    "scrape": "index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevinschaul/bbc-radio-playlist-history.git"
+  },
+  "keywords": [
+    "git-scraping"
+  ],
+  "author": "Kevin Schaul",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kevinschaul/bbc-radio-playlist-history/issues"
+  },
+  "homepage": "https://github.com/kevinschaul/bbc-radio-playlist-history#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "got": "^11.8.5"
+  }
+}
