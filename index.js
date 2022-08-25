@@ -75,8 +75,8 @@ try {
 const combined = uniqWith(data.concat(previousData), isEqual)
 
 const sorted = sortBy(combined, [
-  'episodeTimestamp',
-  'sequence'
+  d => -d.episodeTimestamp,
+  d => d.sequence
 ])
 
 const csvString = await new Promise((resolve, reject) => {
@@ -87,3 +87,4 @@ const csvString = await new Promise((resolve, reject) => {
 fs.writeFileSync(FILENAME, csvString)
 
 })()
+
