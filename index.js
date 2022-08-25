@@ -1,13 +1,15 @@
-const fs = require('fs')
-const cheerio = require('cheerio')
-const got = require('got')
+const fs = require('fs');
+const cheerio = require('cheerio');
+const got = require('got');
+const csv = require('csv');
+const { isEqual, uniqWith, sortBy } = require('lodash');
 
-;(async () => {
-
+(async () => {
 
 // Array of program ids to scrape
 // e.g. https://www.bbc.co.uk/programmes/b01fm4ss/
 const PROGRAMS = ['b01fm4ss']
+const FILENAME = 'history.csv'
 
 const getEpisodes = async (programID) => {
   const url = `https://www.bbc.co.uk/programmes/${programID}/episodes/player`
@@ -39,8 +41,9 @@ const getTracks = async (episodeID) => {
     return {
       artist: $el.find('.segment__track .artist').text(),
       title: $el.find('.segment__track p.no-margin span').text(),
-      album: $el.find('.segment__track li em').text(),
-      recordLabel: $el.find('.segment__track abbr[title="Record Label"]').text(),
+      album: $el.find('.segment__track li em').text().replace(/\. $/, ''),
+      recordLabel: $el.find('.segment__track abbr[title="Record Label"]').text().replace(/\. $/, ''),
+      sequence: i,
       programTitle: programTitle,
       episodeTitle: episodeTitle,
       episodeTimestamp: episodeTimestamp,
@@ -49,19 +52,38 @@ const getTracks = async (episodeID) => {
   return tracks
 }
 
-/*
-let data = {}
+let data = []
 for (const program of PROGRAMS) {
   const episodes = await getEpisodes(program)
-  console.log(episodes)
   for (const episode of episodes) {
-    console.log(episode)
     const tracks = await getTracks(episode)
-    console.log(tracks)
+    data = data.concat(tracks)
   }
 }
-*/
-const tracks = await getTracks('m0019kpt')
-console.log(tracks)
+
+let previousData = []
+try {
+  const file = fs.readFileSync(FILENAME, 'utf-8')
+  previousData = await new Promise((resolve, reject) => {
+    csv.parse(file, { columns: true, cast: true }, (e, d) => {
+      resolve(d)
+    })
+  })
+} catch(e) {
+}
+
+const combined = uniqWith(data.concat(previousData), isEqual)
+
+const sorted = sortBy(combined, [
+  'episodeTimestamp',
+  'sequence'
+])
+
+const csvString = await new Promise((resolve, reject) => {
+  csv.stringify(sorted, { header: true }, function(e, d) {
+    resolve(d)
+  })
+})
+fs.writeFileSync(FILENAME, csvString)
 
 })()

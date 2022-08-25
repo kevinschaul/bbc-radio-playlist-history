@@ -22,6 +22,8 @@
   "homepage": "https://github.com/kevinschaul/bbc-radio-playlist-history#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
-    "got": "^11.8.5"
+    "csv": "^6.2.0",
+    "got": "^11.8.5",
+    "lodash": "^4.17.21"
   }
 }
